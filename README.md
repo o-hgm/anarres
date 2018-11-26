@@ -76,7 +76,7 @@ htpasswd -B /tmp/radicale [user]
 
 Get it from */tmp/radicale*.
 
-## Taskd
+### Taskd
 
 The taskwarrior server.
 
@@ -91,9 +91,17 @@ And then from inside the container run the commands from the
 
 **Note**: The *pki* directory is in */var/taskd/pki/*
 
-## Nextcloud
+### Nextcloud
 
 First user to register will be the admin user.
+
+### NFS
+
+Please refer to [ubunut-help](https://help.ubuntu.com/community/NFSv4Howto) to
+see how NFSv4 works. Make sure to mount the directories you want to export
+inside the */export* folder of the NFS container. Mount them with the `:ro`
+option if you want them to be read-only (and configure them in the **exports**
+conf accordingly).
 
 ## License
 
