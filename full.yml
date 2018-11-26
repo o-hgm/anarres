@@ -1,6 +1,5 @@
 ---
 
-
 - name: Initial tasks
   hosts: all
   become: true
@@ -747,8 +746,7 @@
     docker_command: |
       /usr/bin/docker run --rm --name "{{ service_name }}" \
       -v "{{ nfs_directory.conf }}/exports":/etc/exports:ro \
-      "{{ nfs_export_volumes }}"
-      -p "{{ nfs_port | default('2049') }}:2049" \
+      {{ nfs_export_volumes }}-p "{{ nfs_port | default('2049') }}:2049" \
       "{{ docker_image }}"
   roles:
     - role: generic_docker_systemd

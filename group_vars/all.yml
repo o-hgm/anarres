@@ -173,4 +173,4 @@ nfs_exports_conf: |
   /export       192.168.1.0/24(rw,fsid=0,no_subtree_check)
 
 nfs_export_volumes: |
-  -v "{{ nfs_directory.export }}":/export:ro \
+  -v {{ nfs_directory.export }}:/export:ro \
