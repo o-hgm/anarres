@@ -163,7 +163,7 @@ nextcloud_db_user_pass:
 
 ## NFS
 
-nfs_docker_image: nfs:14-apache
+nfs_docker_image: erichough/nfs-server:latest
 
 nfs_directory:
   export: "{{ data_path }}/nfs/export"
