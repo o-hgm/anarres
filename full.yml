@@ -839,9 +839,11 @@
       /usr/bin/docker run --rm --name "{{ service_name }}" \
       -v {{ openldap_directory.data }}:/var/lib/ldap \
       -v {{ openldap_directory.conf }}:/etc/ldap/slapd.d \
+      -v /etc/letsencrypt/live/{{ openldap_domain }}:/container/service/slapd/assets/certs/live:ro \
+      -v /etc/letsencrypt/archive/{{ openldap_domain }}:/container/service/slapd/assets/certs/archive:ro \
       -p {{ openldap_port }}:389 \
-      -e "LDAP_TLS=false" \
-      {{ docker_image }}
+      -p {{ openldap_port_secure }}:636 \
+      {{ docker_image }} --copy-service
   pre_tasks:
     - name: Create openldap directories
       file:
@@ -861,19 +863,26 @@
         volumes:
           - "{{ openldap_directory.data }}:/var/lib/ldap"
           - "{{ openldap_directory.conf }}:/etc/ldap/slapd.d"
+          - "/etc/letsencrypt/live/{{ openldap_domain }}:/container/service/slapd/assets/certs/live:ro"
+          - "/etc/letsencrypt/archive/{{ openldap_domain }}:/container/service/slapd/assets/certs/archive:ro"
+        ports:
+          "{{ openldap_port_secure }}:636"
         env:
           LDAP_ORGANISATION: "{{ openldap_organization }}"
           LDAP_DOMAIN: "{{ openldap_domain }}"
-          LDAP_ADMIN_PASSWORD: " openldap_admin_password }}"
-          LDAP_TLS: false
-        ports:
-          - "{{ openldap_port }}:389"
+          LDAP_ADMIN_PASSWORD: "{{ openldap_admin_password }}"
+          LDAP_TLS: true
+          LDAP_TLS_CRT_FILENAME: live/cert.pem
+          LDAP_TLS_KEY_FILENAME: live/privkey.pem
+          LDAP_TLS_CA_CRT_FILENAME: live/fullchain.pem
         cleanup: true
+        command: --copy-service
       notify: Wait for OpenLDAP container to be ready
 
     - name: Wait for OpenLDAP container to be ready
       wait_for:
-        port: "{{ openldap_port }}"
+        port: "{{ openldap_port_secure }}"
+      changed_when: true
       notify: Delete the OpenLDAP configuration container
 
     - name: Delete the OpenLDAP configuration container
